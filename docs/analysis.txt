@@ -1,0 +1,23 @@
+Race Condition Analysis Report
+
+Bu projede rate limiting mekanizması üzerinde Race Condition zafiyeti incelenmiştir.
+
+Vulnerable senaryoda:
+- Sistem önce coupon_limit değerini okumaktadır (SELECT)
+- Daha sonra belirli bir gecikme ile update işlemi yapılmaktadır
+- Bu gecikme süresinde birden fazla istek aynı değeri okuyabilir
+
+Sonuç:
+- Aynı anda gelen request'ler limit kontrolünü bypass eder
+- Sistem izin verilen sınırdan fazla kupon dağıtır
+
+Secure senaryoda:
+- Tek SQL sorgusu ile hem kontrol hem azaltma yapılır
+- "WHERE coupon_limit > 0" koşulu ile atomic işlem sağlanır
+
+Sonuç:
+- Race condition oluşmaz
+- Limit korunur
+
+Genel çıkarım:
+Concurrent sistemlerde kontrol ve güncelleme işlemleri ayrı yapılırsa güvenlik zafiyetleri oluşabilir.
